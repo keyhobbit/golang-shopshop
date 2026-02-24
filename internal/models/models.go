@@ -125,10 +125,15 @@ type Banner struct {
 	BaseModel
 	Title     string `gorm:"not null" json:"title"`
 	Subtitle  string `json:"subtitle"`
-	Image     string `gorm:"not null" json:"image"`
+	Image     string `json:"image"`
 	Link      string `json:"link"`
 	SortOrder int    `gorm:"default:0" json:"sort_order"`
 	IsActive  bool   `gorm:"default:true" json:"is_active"`
+}
+
+// ImageURL returns the image URL of the banner.
+func (b Banner) ImageURL() string {
+	return b.Image
 }
 
 type CompanyInfo struct {

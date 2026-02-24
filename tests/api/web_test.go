@@ -197,12 +197,12 @@ func TestWebRegister_Success(t *testing.T) {
 		t.Errorf("expected 200, got %d", resp.StatusCode)
 	}
 
-	var body map[string]string
+	var body map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		t.Fatalf("decode json: %v", err)
 	}
-	if body["status"] != "ok" {
-		t.Errorf("expected status ok, got %s", body["status"])
+	if success, _ := body["success"].(bool); !success {
+		t.Errorf("expected success=true after registration, got body=%v", body)
 	}
 }
 
@@ -229,12 +229,15 @@ func TestWebRegister_DuplicateEmail(t *testing.T) {
 		t.Errorf("expected 400, got %d", resp.StatusCode)
 	}
 
-	var body map[string]string
+	var body map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		t.Fatalf("decode json: %v", err)
 	}
-	if body["error"] == "" {
-		t.Error("expected error field in response")
+	if success, _ := body["success"].(bool); success {
+		t.Error("expected success=false for duplicate email")
+	}
+	if msg, _ := body["message"].(string); msg == "" {
+		t.Error("expected non-empty message for duplicate email")
 	}
 }
 
@@ -260,12 +263,15 @@ func TestWebRegister_MissingFields(t *testing.T) {
 		t.Errorf("expected 400, got %d", resp.StatusCode)
 	}
 
-	var body map[string]string
+	var body map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		t.Fatalf("decode json: %v", err)
 	}
-	if body["error"] == "" {
-		t.Error("expected error field in response")
+	if success, _ := body["success"].(bool); success {
+		t.Error("expected success=false for missing fields")
+	}
+	if msg, _ := body["message"].(string); msg == "" {
+		t.Error("expected non-empty message for missing fields")
 	}
 }
 
@@ -291,12 +297,12 @@ func TestWebLogin_Success(t *testing.T) {
 		t.Errorf("expected 200, got %d", resp.StatusCode)
 	}
 
-	var body map[string]string
+	var body map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		t.Fatalf("decode json: %v", err)
 	}
-	if body["status"] != "ok" {
-		t.Errorf("expected status ok, got %s", body["status"])
+	if success, _ := body["success"].(bool); !success {
+		t.Errorf("expected success=true on login, got body=%v", body)
 	}
 }
 

@@ -471,13 +471,14 @@ func TestE2E_AdminBannerManagement(t *testing.T) {
 
 	cookies := testutil.AdminLoginCookies(t, ts)
 
-	// 2. Create banner (POST without image - handler allows empty image)
+	// 2. Create banner with image URL
 	resp, err := testutil.PostForm(ts, "/banners", cookies, url.Values{
 		"title":      {"E2E Banner"},
 		"subtitle":   {"E2E Subtitle"},
 		"link":       {"/products"},
 		"sort_order": {"0"},
 		"is_active":  {"on"},
+		"image_url":  {"https://example.com/banner.jpg"},
 	})
 	if err != nil {
 		t.Fatalf("create banner: %v", err)
@@ -1007,5 +1008,137 @@ func TestE2E_AdminLoginSessionFlow(t *testing.T) {
 	}
 	if loc := resp.Header.Get("Location"); loc != "/login" {
 		t.Errorf("step 8: expected redirect to /login after logout, got %s", loc)
+	}
+}
+
+// TestE2E_WebUserRegistrationSessionFlow verifies the registration and login JSON
+// response format and that a session cookie is issued so subsequent auth-required
+// requests work.
+func TestE2E_WebUserRegistrationSessionFlow(t *testing.T) {
+	testutil.SetupTestDB(t)
+	testutil.SetupSession()
+
+	e := testutil.NewWebEcho()
+	ts := httptest.NewServer(e)
+	defer ts.Close()
+
+	jar, _ := cookiejar.New(nil)
+	client := clientWithJar(jar)
+
+	// 1. Register with missing fields → 400 with success=false
+	resp, err := client.PostForm(ts.URL+"/register", url.Values{
+		"email":    {"missing@test.com"},
+		"password": {"pass123"},
+		// name is missing
+	})
+	if err != nil {
+		t.Fatalf("step 1: %v", err)
+	}
+	var body map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("step 1: expected 400 for missing fields, got %d", resp.StatusCode)
+	}
+	if success, _ := body["success"].(bool); success {
+		t.Errorf("step 1: expected success=false for missing fields")
+	}
+	if msg, _ := body["message"].(string); msg == "" {
+		t.Errorf("step 1: expected non-empty message for missing fields")
+	}
+
+	// 2. Register successfully → 200 with success=true
+	resp, err = client.PostForm(ts.URL+"/register", url.Values{
+		"name":     {"E2E User"},
+		"email":    {"e2euser@test.com"},
+		"password": {"securepass"},
+	})
+	if err != nil {
+		t.Fatalf("step 2: %v", err)
+	}
+	body = nil
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 2: expected 200 after registration, got %d", resp.StatusCode)
+	}
+	if success, _ := body["success"].(bool); !success {
+		t.Errorf("step 2: expected success=true after registration, got body=%v", body)
+	}
+
+	// 3. Register same email again → 400 with success=false
+	resp, err = client.PostForm(ts.URL+"/register", url.Values{
+		"name":     {"E2E User Dup"},
+		"email":    {"e2euser@test.com"},
+		"password": {"anotherpass"},
+	})
+	if err != nil {
+		t.Fatalf("step 3: %v", err)
+	}
+	body = nil
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("step 3: expected 400 for duplicate email, got %d", resp.StatusCode)
+	}
+	if success, _ := body["success"].(bool); success {
+		t.Errorf("step 3: expected success=false for duplicate email")
+	}
+
+	// 4. Logout (clear session) then attempt login with wrong password → 400 with success=false
+	jar2, _ := cookiejar.New(nil)
+	freshClient := clientWithJar(jar2)
+
+	resp, err = freshClient.PostForm(ts.URL+"/login", url.Values{
+		"email":    {"e2euser@test.com"},
+		"password": {"wrongpass"},
+	})
+	if err != nil {
+		t.Fatalf("step 4: %v", err)
+	}
+	body = nil
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("step 4: expected 400 for wrong password, got %d", resp.StatusCode)
+	}
+	if success, _ := body["success"].(bool); success {
+		t.Errorf("step 4: expected success=false for wrong password")
+	}
+
+	// 5. Login with correct credentials → 200 with success=true, then cart add works
+	cat := testutil.CreateTestCategory(t)
+	prod := testutil.CreateTestProduct(t, cat.ID)
+
+	resp, err = freshClient.PostForm(ts.URL+"/login", url.Values{
+		"email":    {"e2euser@test.com"},
+		"password": {"securepass"},
+	})
+	if err != nil {
+		t.Fatalf("step 5: %v", err)
+	}
+	body = nil
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 5: expected 200 on correct login, got %d", resp.StatusCode)
+	}
+	if success, _ := body["success"].(bool); !success {
+		t.Errorf("step 5: expected success=true on correct login, got body=%v", body)
+	}
+
+	// 6. After login, add to cart succeeds (session cookie was set)
+	resp, err = freshClient.PostForm(ts.URL+"/cart/add", url.Values{"product_id": {prod.ID}})
+	if err != nil {
+		t.Fatalf("step 6: %v", err)
+	}
+	body = nil
+	json.NewDecoder(resp.Body).Decode(&body)
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 6: expected 200 adding to cart after login, got %d", resp.StatusCode)
+	}
+	if n, _ := body["cartCount"].(float64); int(n) != 1 {
+		t.Errorf("step 6: expected cartCount=1 after add to cart, got %v", body["cartCount"])
 	}
 }

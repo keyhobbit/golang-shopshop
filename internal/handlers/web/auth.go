@@ -17,17 +17,17 @@ func Register(c echo.Context) error {
 	password := c.FormValue("password")
 
 	if name == "" || email == "" || password == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Vui lòng điền đầy đủ thông tin"})
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Vui lòng điền đầy đủ thông tin"})
 	}
 
 	var existing models.User
 	if err := database.DB.Where("email = ?", email).First(&existing).Error; err == nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Email đã được sử dụng"})
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email đã được sử dụng"})
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Lỗi hệ thống"})
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"success": false, "message": "Lỗi hệ thống"})
 	}
 
 	user := models.User{
@@ -36,7 +36,7 @@ func Register(c echo.Context) error {
 		Password: string(hash),
 	}
 	if err := database.DB.Create(&user).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Không thể tạo tài khoản"})
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"success": false, "message": "Không thể tạo tài khoản"})
 	}
 
 	sess := session.GetWebSession(c)
@@ -44,7 +44,7 @@ func Register(c echo.Context) error {
 	sess.Values["user_name"] = user.Name
 	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "ok", "redirect": c.FormValue("redirect")})
+	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": c.FormValue("redirect")})
 }
 
 func Login(c echo.Context) error {
@@ -53,11 +53,11 @@ func Login(c echo.Context) error {
 
 	var user models.User
 	if err := database.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Email hoặc mật khẩu không đúng"})
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email hoặc mật khẩu không đúng"})
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Email hoặc mật khẩu không đúng"})
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email hoặc mật khẩu không đúng"})
 	}
 
 	sess := session.GetWebSession(c)
@@ -65,7 +65,7 @@ func Login(c echo.Context) error {
 	sess.Values["user_name"] = user.Name
 	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "ok", "redirect": c.FormValue("redirect")})
+	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": c.FormValue("redirect")})
 }
 
 func Logout(c echo.Context) error {

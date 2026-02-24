@@ -538,6 +538,7 @@ func TestAdminBanners_CRUD(t *testing.T) {
 		"link":       {"/products"},
 		"sort_order": {"0"},
 		"is_active":  {"on"},
+		"image_url":  {"https://example.com/banner.jpg"},
 	})
 	if err != nil {
 		t.Fatalf("post create failed: %v", err)
@@ -617,11 +618,11 @@ func TestAdminCompany_Update(t *testing.T) {
 		"name":         {"Test Company Inc"},
 		"tagline":      {"New tagline"},
 		"email":        {"company@test.com"},
-		"phone":       {"0909123456"},
-		"address":     {"123 Test St"},
+		"phone":        {"0909123456"},
+		"address":      {"123 Test St"},
 		"facebook_url": {"https://facebook.com/test"},
-		"zalo_url":    {"https://zalo.me/test"},
-		"copyright":   {"© 2026 Test"},
+		"zalo_url":     {"https://zalo.me/test"},
+		"copyright":    {"© 2026 Test"},
 	})
 	if err != nil {
 		t.Fatalf("post failed: %v", err)

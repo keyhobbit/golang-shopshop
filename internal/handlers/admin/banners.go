@@ -45,7 +45,18 @@ func BannerStore(c echo.Context) error {
 		IsActive:  c.FormValue("is_active") == "on",
 	}
 
-	banner.Image = handleBannerUpload(c)
+	// Prefer uploaded file; fall back to image URL text input
+	if img := handleBannerUpload(c); img != "" {
+		banner.Image = img
+	} else if urlInput := c.FormValue("image_url"); urlInput != "" {
+		banner.Image = urlInput
+	} else {
+		data := adminData(c)
+		data["Title"] = "Thêm Banner"
+		data["Active"] = "banners"
+		data["Error"] = "Vui lòng tải hình ảnh hoặc nhập URL hình ảnh"
+		return c.Render(http.StatusOK, "admin/banners/form", data)
+	}
 
 	if err := database.DB.Create(&banner).Error; err != nil {
 		data := adminData(c)
@@ -90,7 +101,10 @@ func BannerUpdate(c echo.Context) error {
 
 	if img := handleBannerUpload(c); img != "" {
 		banner.Image = img
+	} else if urlInput := c.FormValue("image_url"); urlInput != "" {
+		banner.Image = urlInput
 	}
+	// if neither provided, keep existing banner.Image
 
 	database.DB.Save(&banner)
 
