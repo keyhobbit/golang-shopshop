@@ -1,0 +1,166 @@
+{{define "page_content"}}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="font-elegant text-3xl font-bold text-feng-jade mb-8">Giỏ hàng</h1>
+
+    {{if .CartItems}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart items -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-feng-gold/10 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-feng-sand">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-feng-earth-dark">Sản phẩm</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-feng-earth-dark">Đơn giá</th>
+                                <th class="px-4 py-3 text-center text-sm font-medium text-feng-earth-dark">Số lượng</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-feng-earth-dark">Thành tiền</th>
+                                <th class="px-4 py-3 w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-feng-gold/10">
+                            {{range .CartItems}}
+                            <tr class="cart-row" data-product-id="{{.ProductID}}">
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-feng-sand flex-shrink-0">
+                                            {{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" class="w-full h-full object-cover">{{else}}<div class="w-full h-full flex items-center justify-center text-feng-gold/40"><i class="fas fa-image"></i></div>{{end}}
+                                        </div>
+                                        <span class="font-medium text-feng-earth-dark">{{.Name}}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="font-medium text-feng-jade">{{formatPrice .Price}}</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="updateCartQty('{{.ProductID}}', -1)" class="w-8 h-8 rounded border border-feng-gold/30 hover:bg-feng-gold/10 flex items-center justify-center text-feng-earth">−</button>
+                                        <span class="cart-qty w-10 text-center font-medium" data-product-id="{{.ProductID}}">{{.Quantity}}</span>
+                                        <button onclick="updateCartQty('{{.ProductID}}', 1)" class="w-8 h-8 rounded border border-feng-gold/30 hover:bg-feng-gold/10 flex items-center justify-center text-feng-earth">+</button>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-right font-medium cart-subtotal" data-product-id="{{.ProductID}}" data-unit-price="{{.Price}}">
+                                    {{formatPrice (mulInt .Price .Quantity)}}
+                                </td>
+                                <td class="px-4 py-4">
+                                    <button onclick="removeCartItem('{{.ProductID}}')" class="text-red-500 hover:text-red-700 p-1"><i class="fas fa-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary & Checkout -->
+        <div>
+            <div class="bg-white rounded-xl shadow-sm border border-feng-gold/10 p-6 sticky top-24">
+                <h3 class="font-semibold text-feng-earth-dark mb-4">Tổng cộng</h3>
+                <p class="text-2xl font-bold text-feng-jade mb-6" id="cartTotal">{{formatPrice .CartTotal}}</p>
+                <a href="/products" class="block text-center py-2 text-feng-jade hover:text-feng-jade-light font-medium mb-4">Tiếp tục mua sắm</a>
+
+                {{if .IsLoggedIn}}
+                <form id="checkoutForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-feng-earth-dark mb-1">Họ tên</label>
+                        <input type="text" name="name" required value="{{.UserName}}" class="w-full px-4 py-2 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-feng-earth-dark mb-1">Số điện thoại</label>
+                        <input type="tel" name="phone" required class="w-full px-4 py-2 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50" placeholder="0901234567">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-feng-earth-dark mb-1">Địa chỉ</label>
+                        <textarea name="address" required rows="2" class="w-full px-4 py-2 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50" placeholder="Số nhà, đường, phường, quận..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-feng-earth-dark mb-1">Ghi chú</label>
+                        <textarea name="note" rows="2" class="w-full px-4 py-2 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50" placeholder="Ghi chú cho đơn hàng..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-feng-jade hover:bg-feng-jade-dark text-white font-medium rounded-lg transition-colors">
+                        Đặt hàng
+                    </button>
+                </form>
+                {{else}}
+                <p class="text-sm text-feng-earth/80 mb-4">Vui lòng đăng nhập để đặt hàng</p>
+                <button onclick="openAuthModal('login')" class="w-full py-3 bg-feng-gold hover:bg-feng-gold-dark text-white font-medium rounded-lg transition-colors">
+                    Đăng nhập để đặt hàng
+                </button>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    {{else}}
+    <div class="text-center py-16 bg-white rounded-xl border border-feng-gold/10">
+        <i class="fas fa-shopping-bag text-6xl text-feng-gold/40 mb-4"></i>
+        <p class="text-feng-earth/70 text-lg">Giỏ hàng trống</p>
+        <a href="/products" class="inline-block mt-4 px-6 py-3 bg-feng-gold hover:bg-feng-gold-dark text-white font-medium rounded-lg transition-colors">Xem sản phẩm</a>
+    </div>
+    {{end}}
+</div>
+
+{{if .CartItems}}
+<script>
+async function updateCartQty(productId, delta) {
+    const qtyEl = document.querySelector(`.cart-qty[data-product-id="${productId}"]`);
+    const row = document.querySelector(`.cart-row[data-product-id="${productId}"]`);
+    if (!qtyEl || !row) return;
+    const action = delta > 0 ? 'increase' : 'decrease';
+    try {
+        const fd = new FormData();
+        fd.append('product_id', productId);
+        fd.append('action', action);
+        const res = await fetch('/cart/update', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            qtyEl.textContent = parseInt(qtyEl.textContent) + delta;
+            const subtotalEl = row.querySelector('.cart-subtotal');
+            const unitPrice = parseFloat(subtotalEl.dataset.unitPrice) || 0;
+            const newQty = parseInt(qtyEl.textContent) || 0;
+            subtotalEl.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(unitPrice * newQty);
+            document.getElementById('cartTotal').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.cartTotal || 0);
+            if (data.cartCount !== undefined) updateCartCount(data.cartCount);
+            if (newQty <= 0) row.remove();
+            if (data.cartCount === 0) location.reload();
+        }
+    } catch (e) { console.error(e); }
+}
+async function removeCartItem(productId) {
+    try {
+        const fd = new FormData();
+        fd.append('product_id', productId);
+        fd.append('action', 'remove');
+        const res = await fetch('/cart/update', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            document.querySelector(`.cart-row[data-product-id="${productId}"]`)?.remove();
+            document.getElementById('cartTotal').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.cartTotal || 0);
+            if (data.cartCount !== undefined) updateCartCount(data.cartCount);
+            if (data.cartCount === 0) location.reload();
+        }
+    } catch (e) { console.error(e); }
+}
+document.getElementById('checkoutForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    const body = Object.fromEntries(fd);
+    try {
+        const res = await fetch('/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) {
+            window.location.href = data.redirect || '/orders/' + data.order_id;
+        } else {
+            alert(data.message || 'Có lỗi xảy ra');
+        }
+    } catch (err) {
+        alert('Có lỗi xảy ra');
+    }
+});
+</script>
+{{end}}
+{{end}}

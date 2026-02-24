@@ -1,0 +1,71 @@
+/* Custom styles for Shoop E-commerce */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Banner slider transitions */
+.banner-slide {
+    transition: opacity 0.8s ease-in-out;
+}
+
+/* Product card hover effects */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Sale badge pulse */
+.sale-badge {
+    animation: pulse-badge 2s infinite;
+}
+@keyframes pulse-badge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+}
+
+/* Quantity input styling */
+.qty-btn {
+    transition: background-color 0.2s ease;
+}
+.qty-btn:hover {
+    background-color: #d4a574;
+    color: white;
+}
+
+/* Toast notification */
+.toast {
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 3.7s;
+}
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #d4a574;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

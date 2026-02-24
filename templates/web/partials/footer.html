@@ -1,0 +1,53 @@
+{{define "footer"}}
+<footer class="bg-feng-earth-dark text-feng-cream mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+            <!-- Company info -->
+            <div>
+                <h3 class="font-elegant text-2xl font-bold text-feng-gold mb-4">OCC.IO.VN</h3>
+                {{if .Company}}
+                <p class="text-feng-cream/90 text-sm leading-relaxed">{{.Company.Address}}</p>
+                {{if .Company.Phone}}<p class="mt-2"><i class="fas fa-phone mr-2 text-feng-gold/80"></i>{{.Company.Phone}}</p>{{end}}
+                {{if .Company.Email}}<p class="mt-1"><i class="fas fa-envelope mr-2 text-feng-gold/80"></i>{{.Company.Email}}</p>{{end}}
+                {{else}}
+                <p class="text-feng-cream/90 text-sm">Phong thủy hài hòa - Mang may mắn đến nhà bạn</p>
+                {{end}}
+            </div>
+
+            <!-- Quick links -->
+            <div>
+                <h4 class="font-semibold text-feng-gold mb-4">Liên kết nhanh</h4>
+                <ul class="space-y-2">
+                    <li><a href="/" class="text-feng-cream/90 hover:text-feng-gold transition-colors">Trang chủ</a></li>
+                    <li><a href="/products" class="text-feng-cream/90 hover:text-feng-gold transition-colors">Sản phẩm</a></li>
+                    <li><a href="/about" class="text-feng-cream/90 hover:text-feng-gold transition-colors">Giới thiệu</a></li>
+                    <li><a href="/contact" class="text-feng-cream/90 hover:text-feng-gold transition-colors">Liên hệ</a></li>
+                </ul>
+            </div>
+
+            <!-- Social -->
+            <div>
+                <h4 class="font-semibold text-feng-gold mb-4">Kết nối</h4>
+                <div class="flex gap-4">
+                    {{if .Company}}
+                    {{if .Company.FacebookURL}}<a href="{{.Company.FacebookURL}}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-feng-gold/20 hover:bg-feng-gold flex items-center justify-center transition-colors"><i class="fab fa-facebook-f"></i></a>{{end}}
+                    {{if .Company.ZaloURL}}<a href="{{.Company.ZaloURL}}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-feng-gold/20 hover:bg-feng-gold flex items-center justify-center transition-colors"><i class="fas fa-comment-dots"></i></a>{{end}}
+                    {{else}}
+                    <a href="#" class="w-10 h-10 rounded-full bg-feng-gold/20 hover:bg-feng-gold flex items-center justify-center text-feng-cream transition-colors"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-feng-gold/20 hover:bg-feng-gold flex items-center justify-center text-feng-cream transition-colors"><i class="fas fa-comment-dots"></i></a>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <div>
+                <p class="font-elegant text-lg text-feng-gold/90 italic">"Phong thủy hài hòa - Mang may mắn đến nhà bạn"</p>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-feng-gold/20 text-center text-feng-cream/70 text-sm">
+            © 2026 OCC.IO.VN. All rights reserved.
+        </div>
+    </div>
+</footer>
+{{end}}

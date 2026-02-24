@@ -1,0 +1,65 @@
+{{define "content"}}
+<div class="max-w-2xl">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800">Thông tin công ty</h3>
+    </div>
+
+    {{if .Error}}
+    <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+        {{.Error}}
+    </div>
+    {{end}}
+
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <form method="POST" action="/admin/company">
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Tên công ty <span class="text-red-500">*</span></label>
+                    <input type="text" id="name" name="name" value="{{if .Company}}{{.Company.Name}}{{end}}" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green">
+                </div>
+                <div>
+                    <label for="tagline" class="block text-sm font-medium text-gray-700 mb-1">Tagline / Slogan</label>
+                    <input type="text" id="tagline" name="tagline" value="{{if .Company}}{{.Company.Tagline}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="email" name="email" value="{{if .Company}}{{.Company.Email}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green">
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                    <input type="text" id="phone" name="phone" value="{{if .Company}}{{.Company.Phone}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                    <textarea id="address" name="address" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green">{{if .Company}}{{.Company.Address}}{{end}}</textarea>
+                </div>
+                <div>
+                    <label for="facebook_url" class="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
+                    <input type="url" id="facebook_url" name="facebook_url" value="{{if .Company}}{{.Company.FacebookURL}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green" placeholder="https://facebook.com/...">
+                </div>
+                <div>
+                    <label for="zalo_url" class="block text-sm font-medium text-gray-700 mb-1">Zalo URL</label>
+                    <input type="url" id="zalo_url" name="zalo_url" value="{{if .Company}}{{.Company.ZaloURL}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green" placeholder="https://zalo.me/...">
+                </div>
+                <div>
+                    <label for="copyright" class="block text-sm font-medium text-gray-700 mb-1">Copyright</label>
+                    <input type="text" id="copyright" name="copyright" value="{{if .Company}}{{.Company.Copyright}}{{end}}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-admin-green focus:border-admin-green" placeholder="© 2025 Công ty ABC">
+                </div>
+            </div>
+            <div class="mt-6">
+                <button type="submit" class="px-4 py-2 bg-admin-green text-admin-black font-semibold rounded-lg hover:bg-admin-green-dark hover:text-white transition-colors">
+                    Lưu thông tin
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

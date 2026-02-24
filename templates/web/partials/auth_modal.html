@@ -1,0 +1,144 @@
+{{define "auth_modal"}}
+<div id="authModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAuthModal()"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-feng-gold via-feng-jade to-feng-gold"></div>
+            <div class="p-8">
+                <div class="flex border-b border-feng-gold/20 mb-6">
+                    <button id="authTabLogin" class="flex-1 py-3 font-medium text-feng-jade border-b-2 border-feng-jade -mb-px transition-colors">Đăng nhập</button>
+                    <button id="authTabRegister" class="flex-1 py-3 font-medium text-feng-earth/70 hover:text-feng-earth border-b-2 border-transparent -mb-px transition-colors">Đăng ký</button>
+                </div>
+
+                <!-- Login form -->
+                <div id="authLoginForm">
+                    <form id="loginForm" class="space-y-4">
+                        <input type="hidden" name="redirect" value="">
+                        <div>
+                            <label class="block text-sm font-medium text-feng-earth-dark mb-1">Email</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50 transition-colors" placeholder="email@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-feng-earth-dark mb-1">Mật khẩu</label>
+                            <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50 transition-colors" placeholder="••••••••">
+                        </div>
+                        <div id="loginError" class="hidden text-red-600 text-sm"></div>
+                        <button type="submit" class="w-full py-3 bg-feng-jade hover:bg-feng-jade-dark text-white font-medium rounded-lg transition-colors">
+                            Đăng nhập
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register form -->
+                <div id="authRegisterForm" class="hidden">
+                    <form id="registerForm" class="space-y-4">
+                        <input type="hidden" name="redirect" value="">
+                        <div>
+                            <label class="block text-sm font-medium text-feng-earth-dark mb-1">Họ tên</label>
+                            <input type="text" name="name" required class="w-full px-4 py-3 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50 transition-colors" placeholder="Nguyễn Văn A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-feng-earth-dark mb-1">Email</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50 transition-colors" placeholder="email@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-feng-earth-dark mb-1">Mật khẩu</label>
+                            <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-feng-gold/30 focus:border-feng-gold focus:ring-1 focus:ring-feng-gold/50 transition-colors" placeholder="••••••••">
+                        </div>
+                        <div id="registerError" class="hidden text-red-600 text-sm"></div>
+                        <button type="submit" class="w-full py-3 bg-feng-gold hover:bg-feng-gold-dark text-white font-medium rounded-lg transition-colors">
+                            Đăng ký
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    const loginTab = document.getElementById('authTabLogin');
+    const registerTab = document.getElementById('authTabRegister');
+    const loginForm = document.getElementById('authLoginForm');
+    const registerForm = document.getElementById('authRegisterForm');
+
+    function showLogin() {
+        loginTab.classList.add('text-feng-jade', 'border-feng-jade');
+        loginTab.classList.remove('text-feng-earth/70');
+        registerTab.classList.remove('text-feng-jade', 'border-feng-jade');
+        registerTab.classList.add('text-feng-earth/70');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    }
+    function showRegister() {
+        registerTab.classList.add('text-feng-jade', 'border-feng-jade');
+        registerTab.classList.remove('text-feng-earth/70');
+        loginTab.classList.remove('text-feng-jade', 'border-feng-jade');
+        loginTab.classList.add('text-feng-earth/70');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    }
+
+    loginTab?.addEventListener('click', showLogin);
+    registerTab?.addEventListener('click', showRegister);
+
+    // Set redirect from URL
+    const redirect = new URLSearchParams(window.location.search).get('redirect') || window.location.pathname;
+    document.querySelectorAll('input[name="redirect"]').forEach(el => { el.value = redirect; });
+
+    // Login form submit
+    document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const errEl = document.getElementById('loginError');
+        errEl.classList.add('hidden');
+        const fd = new FormData(form);
+        const body = Object.fromEntries(fd);
+        try {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = body.redirect || '/';
+            } else {
+                errEl.textContent = data.message || 'Đăng nhập thất bại';
+                errEl.classList.remove('hidden');
+            }
+        } catch (err) {
+            errEl.textContent = 'Có lỗi xảy ra. Vui lòng thử lại.';
+            errEl.classList.remove('hidden');
+        }
+    });
+
+    // Register form submit
+    document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const errEl = document.getElementById('registerError');
+        errEl.classList.add('hidden');
+        const fd = new FormData(form);
+        const body = Object.fromEntries(fd);
+        try {
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = body.redirect || '/';
+            } else {
+                errEl.textContent = data.message || 'Đăng ký thất bại';
+                errEl.classList.remove('hidden');
+            }
+        } catch (err) {
+            errEl.textContent = 'Có lỗi xảy ra. Vui lòng thử lại.';
+            errEl.classList.remove('hidden');
+        }
+    });
+})();
+</script>
+{{end}}

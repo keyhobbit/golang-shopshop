@@ -1,0 +1,91 @@
+{{define "page_content"}}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {{$p := .Product}}
+    {{if $p}}
+    <!-- Breadcrumb -->
+    <nav class="mb-6 text-sm text-feng-earth/80">
+        <a href="/" class="hover:text-feng-gold">Trang chủ</a>
+        <span class="mx-2">/</span>
+        <a href="/products" class="hover:text-feng-gold">Sản phẩm</a>
+        {{if $p.Category}}<span class="mx-2">/</span><a href="/products?category={{$p.Category.Slug}}" class="hover:text-feng-gold">{{$p.Category.Name}}</a>{{end}}
+        <span class="mx-2">/</span>
+        <span class="text-feng-earth-dark">{{truncate $p.Name 50}}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <!-- Image gallery -->
+        <div class="space-y-4">
+            <div class="aspect-square rounded-xl overflow-hidden bg-feng-sand" id="mainImageContainer">
+                {{if $p.Images}}
+                <img src="{{(index $p.Images 0).URL}}" alt="{{$p.Name}}" id="mainImage" class="w-full h-full object-cover">
+                {{else}}
+                <div class="w-full h-full flex items-center justify-center text-feng-gold/40"><i class="fas fa-image text-8xl"></i></div>
+                {{end}}
+            </div>
+            {{if $p.Images}}
+            <div class="flex gap-2 overflow-x-auto pb-2">
+                {{range $i, $img := $p.Images}}
+                <button onclick="document.getElementById('mainImage').src='{{$img.URL}}'" class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 {{if eq $i 0}}border-feng-gold{{else}}border-transparent hover:border-feng-gold/50{{end}} transition-colors">
+                    <img src="{{$img.URL}}" alt="" class="w-full h-full object-cover">
+                </button>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Product info -->
+        <div>
+            {{if $p.Category}}<a href="/products?category={{$p.Category.Slug}}" class="text-sm text-feng-jade hover:text-feng-jade-light">{{$p.Category.Name}}</a>{{end}}
+            <h1 class="font-elegant text-2xl md:text-3xl font-bold text-feng-earth-dark mt-2">{{$p.Name}}</h1>
+            {{if $p.Description}}<p class="mt-2 text-feng-earth/80">{{$p.Description}}</p>{{end}}
+
+            <div class="mt-6 flex items-center gap-4 flex-wrap">
+                {{if and $p.OriginalPrice $p.SalePrice (gt $p.OriginalPrice $p.SalePrice)}}
+                <span class="text-xl text-gray-400 line-through">{{formatPrice $p.OriginalPrice}}</span>
+                <span class="text-3xl font-bold text-feng-jade">{{formatPrice $p.SalePrice}}</span>
+                <span class="bg-feng-jade text-white text-sm font-bold px-3 py-1 rounded-full">-{{salePercent $p.OriginalPrice $p.SalePrice}}%</span>
+                {{else if $p.SalePrice}}
+                <span class="text-3xl font-bold text-feng-earth-dark">{{formatPrice $p.SalePrice}}</span>
+                {{else if $p.OriginalPrice}}
+                <span class="text-3xl font-bold text-feng-earth-dark">{{formatPrice $p.OriginalPrice}}</span>
+                {{end}}
+            </div>
+
+            <div class="mt-6 flex items-center gap-4">
+                <div class="flex items-center border border-feng-gold/30 rounded-lg overflow-hidden">
+                    <button onclick="var q=document.getElementById('qty'); var v=parseInt(q.value)||1; if(v>1) q.value=v-1" class="px-4 py-2 text-feng-earth hover:bg-feng-gold/10 transition-colors">−</button>
+                    <input type="number" id="qty" value="1" min="1" class="w-16 text-center border-0 border-x border-feng-gold/20 py-2 focus:ring-0">
+                    <button onclick="var q=document.getElementById('qty'); q.value=(parseInt(q.value)||1)+1" class="px-4 py-2 text-feng-earth hover:bg-feng-gold/10 transition-colors">+</button>
+                </div>
+                <button onclick="addToCart('{{$p.ID}}', parseInt(document.getElementById('qty').value)||1)" class="flex-1 py-3 px-6 bg-feng-gold hover:bg-feng-gold-dark text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-shopping-bag"></i> Thêm vào giỏ
+                </button>
+            </div>
+
+            {{if $p.Content}}
+            <div class="mt-10 pt-8 border-t border-feng-gold/20 prose prose-feng max-w-none">
+                {{safeHTML $p.Content}}
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Related products -->
+    {{if .RelatedProducts}}
+    <section class="mt-16 pt-12 border-t border-feng-gold/20">
+        <h2 class="font-elegant text-2xl font-bold text-feng-jade mb-6">Sản phẩm liên quan</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {{range .RelatedProducts}}
+            {{template "product_card" .}}
+            {{end}}
+        </div>
+    </section>
+    {{end}}
+    {{else}}
+    <div class="text-center py-16">
+        <p class="text-feng-earth/70">Không tìm thấy sản phẩm</p>
+        <a href="/products" class="inline-block mt-4 text-feng-jade hover:text-feng-jade-light font-medium">Quay lại danh sách</a>
+    </div>
+    {{end}}
+</div>
+{{end}}

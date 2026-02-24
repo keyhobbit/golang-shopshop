@@ -1,0 +1,36 @@
+services:
+  web:
+    build: .
+    command: ./bin/web
+    ports:
+      - "8600:8600"
+    environment:
+      - APP_ENV=production
+      - WEB_PORT=8600
+      - DB_PATH=/app/data/shoop.db
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-in-production-please}
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - db-data:/app/data
+      - uploads:/app/uploads
+    restart: unless-stopped
+
+  admin:
+    build: .
+    command: ./bin/admin
+    ports:
+      - "18600:18600"
+    environment:
+      - APP_ENV=production
+      - ADMIN_PORT=18600
+      - DB_PATH=/app/data/shoop.db
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-in-production-please}
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - db-data:/app/data
+      - uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  uploads:

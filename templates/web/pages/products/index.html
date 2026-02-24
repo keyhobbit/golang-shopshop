@@ -1,0 +1,57 @@
+{{define "page_content"}}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-6 text-sm text-feng-earth/80">
+        <a href="/" class="hover:text-feng-gold">Trang chủ</a>
+        <span class="mx-2">/</span>
+        <span class="text-feng-earth-dark">Sản phẩm</span>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar -->
+        <aside class="lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-feng-gold/10 sticky top-24">
+                <h3 class="font-semibold text-feng-jade mb-4">Danh mục</h3>
+                <ul class="space-y-1">
+                    <li><a href="/products" class="block py-2 text-feng-earth-dark hover:text-feng-gold {{if not .CurrentCategory}}font-medium text-feng-jade{{end}}">Tất cả</a></li>
+                    {{range .NavCategories}}
+                    <li><a href="/products?category={{.Slug}}" class="block py-2 text-feng-earth-dark hover:text-feng-gold {{if and $.CurrentCategory (eq $.CurrentCategory.Slug .Slug)}}font-medium text-feng-jade{{end}}">{{.Name}}</a></li>
+                    {{end}}
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Product grid -->
+        <div class="flex-1">
+            {{if .Products}}
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {{range .Products}}
+                {{template "product_card" .}}
+                {{end}}
+            </div>
+
+            <!-- Pagination -->
+            {{if gt .TotalPages 1}}
+            <nav class="mt-10 flex justify-center gap-2">
+                {{if gt .Page 1}}
+                <a href="?page={{sub .Page 1}}{{if .CurrentCategory}}&category={{.CurrentCategory.Slug}}{{end}}{{if .SearchQuery}}&q={{.SearchQuery}}{{end}}" class="px-4 py-2 rounded-lg border border-feng-gold/30 hover:bg-feng-gold/10 text-feng-earth-dark transition-colors"><i class="fas fa-chevron-left"></i></a>
+                {{end}}
+                {{range $i := seq .TotalPages}}
+                <a href="?page={{$i}}{{if $.CurrentCategory}}&category={{$.CurrentCategory.Slug}}{{end}}{{if $.SearchQuery}}&q={{$.SearchQuery}}{{end}}" class="px-4 py-2 rounded-lg {{if eq $i $.Page}}bg-feng-jade text-white{{else}}border border-feng-gold/30 hover:bg-feng-gold/10 text-feng-earth-dark{{end}} transition-colors">{{$i}}</a>
+                {{end}}
+                {{if lt .Page .TotalPages}}
+                <a href="?page={{add .Page 1}}{{if .CurrentCategory}}&category={{.CurrentCategory.Slug}}{{end}}{{if .SearchQuery}}&q={{.SearchQuery}}{{end}}" class="px-4 py-2 rounded-lg border border-feng-gold/30 hover:bg-feng-gold/10 text-feng-earth-dark transition-colors"><i class="fas fa-chevron-right"></i></a>
+                {{end}}
+            </nav>
+            {{end}}
+            {{else}}
+            <div class="text-center py-16 bg-white rounded-xl border border-feng-gold/10">
+                <i class="fas fa-box-open text-5xl text-feng-gold/40 mb-4"></i>
+                <p class="text-feng-earth/70">Không tìm thấy sản phẩm nào</p>
+                <a href="/products" class="inline-block mt-4 text-feng-jade hover:text-feng-jade-light font-medium">Xem tất cả sản phẩm</a>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

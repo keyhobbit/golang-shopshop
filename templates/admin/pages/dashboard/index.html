@@ -1,0 +1,82 @@
+{{define "content"}}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Sản phẩm</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1">{{.ProductCount}}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-box text-green-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Đơn hàng</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1">{{.OrderCount}}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Khách hàng</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1">{{.UserCount}}</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-users text-purple-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-yellow-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Danh mục</p>
+                <p class="text-3xl font-bold text-gray-800 mt-1">{{.CategoryCount}}</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-tags text-yellow-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm">
+    <div class="p-6 border-b">
+        <h3 class="text-lg font-semibold text-gray-800">Đơn hàng gần đây</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã đơn</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày tạo</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {{range .RecentOrders}}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-mono text-gray-600">{{truncate .ID 8}}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">{{.User.Name}}</td>
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-800">{{formatPrice .TotalAmount}}</td>
+                    <td class="px-6 py-4">{{statusBadge .Status}}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{formatDateTime .CreatedAt}}</td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">Chưa có đơn hàng nào</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{end}}

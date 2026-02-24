@@ -1,0 +1,80 @@
+{{define "page_content"}}
+<!-- Banner slider -->
+<div class="relative overflow-hidden">
+    <div id="bannerSlider" class="flex transition-transform duration-700 ease-in-out">
+        {{range $i, $b := .Banners}}
+        <div class="w-full flex-shrink-0 min-h-[280px] md:min-h-[400px] lg:min-h-[500px] bg-cover bg-center flex items-center justify-center" style="background-image: linear-gradient(rgba(45,106,79,0.3), rgba(139,115,85,0.2)), url('{{$b.Image}}');">
+            <div class="text-center px-4">
+                {{if $b.Title}}<h2 class="font-elegant text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">{{$b.Title}}</h2>{{end}}
+                {{if $b.Subtitle}}<p class="mt-2 text-lg md:text-xl text-white/95 drop-shadow">{{$b.Subtitle}}</p>{{end}}
+                {{if $b.Link}}<a href="{{$b.Link}}" class="inline-block mt-4 px-6 py-3 bg-feng-gold hover:bg-feng-gold-dark text-white font-medium rounded-lg transition-colors">Xem thêm</a>{{end}}
+            </div>
+        </div>
+        {{else}}
+        <div class="w-full flex-shrink-0 min-h-[280px] md:min-h-[400px] bg-gradient-to-br from-feng-jade via-feng-jade-light to-feng-gold flex items-center justify-center">
+            <div class="text-center px-4">
+                <h2 class="font-elegant text-4xl md:text-5xl font-bold text-white">OCC.IO.VN</h2>
+                <p class="mt-2 text-xl text-white/95">Phong thủy hài hòa - Mang may mắn đến nhà bạn</p>
+                <a href="/products" class="inline-block mt-4 px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-medium rounded-lg transition-colors backdrop-blur">Khám phá sản phẩm</a>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{if .Banners}}
+    <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        {{range $i, $b := .Banners}}
+        <button onclick="goToSlide({{$i}})" class="banner-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-colors {{if eq $i 0}}bg-white{{end}}" aria-label="Slide {{add $i 1}}"></button>
+        {{end}}
+    </div>
+    {{end}}
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <!-- Featured products -->
+    <section class="mb-16">
+        <h2 class="font-elegant text-3xl md:text-4xl font-bold text-feng-jade mb-8 text-center">Sản phẩm nổi bật</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {{range .FeaturedProducts}}
+            {{template "product_card" .}}
+            {{else}}
+            <p class="col-span-full text-center text-feng-earth/70 py-12">Chưa có sản phẩm nổi bật</p>
+            {{end}}
+        </div>
+    </section>
+
+    <!-- Latest products -->
+    <section>
+        <h2 class="font-elegant text-3xl md:text-4xl font-bold text-feng-jade mb-8 text-center">Sản phẩm mới</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {{range .LatestProducts}}
+            {{template "product_card" .}}
+            {{else}}
+            <p class="col-span-full text-center text-feng-earth/70 py-12">Chưa có sản phẩm mới</p>
+            {{end}}
+        </div>
+    </section>
+</div>
+
+{{if .Banners}}
+<script>
+(function() {
+    const slides = document.querySelectorAll('#bannerSlider > div');
+    const dots = document.querySelectorAll('.banner-dot');
+    let current = 0;
+    const total = slides.length;
+    let timer;
+    function show(i) {
+        current = (i + total) % total;
+        document.getElementById('bannerSlider').style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((d, j) => d.classList.toggle('bg-white', j === current));
+    }
+    function next() { show(current + 1); }
+    function goToSlide(i) { show(i); clearInterval(timer); timer = setInterval(next, 5000); }
+    if (total > 1) {
+        timer = setInterval(next, 5000);
+    }
+    window.goToSlide = goToSlide;
+})();
+</script>
+{{end}}
+{{end}}
