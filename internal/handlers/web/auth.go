@@ -12,27 +12,33 @@ import (
 )
 
 func Register(c echo.Context) error {
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-	password := c.FormValue("password")
+	var req struct {
+		Name     string `json:"name" form:"name"`
+		Email    string `json:"email" form:"email"`
+		Password string `json:"password" form:"password"`
+		Redirect string `json:"redirect" form:"redirect"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Dữ liệu không hợp lệ"})
+	}
 
-	if name == "" || email == "" || password == "" {
+	if req.Name == "" || req.Email == "" || req.Password == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Vui lòng điền đầy đủ thông tin"})
 	}
 
 	var existing models.User
-	if err := database.DB.Where("email = ?", email).First(&existing).Error; err == nil {
+	if err := database.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email đã được sử dụng"})
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"success": false, "message": "Lỗi hệ thống"})
 	}
 
 	user := models.User{
-		Name:     name,
-		Email:    email,
+		Name:     req.Name,
+		Email:    req.Email,
 		Password: string(hash),
 	}
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -44,19 +50,25 @@ func Register(c echo.Context) error {
 	sess.Values["user_name"] = user.Name
 	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": c.FormValue("redirect")})
+	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": req.Redirect})
 }
 
 func Login(c echo.Context) error {
-	email := c.FormValue("email")
-	password := c.FormValue("password")
+	var req struct {
+		Email    string `json:"email" form:"email"`
+		Password string `json:"password" form:"password"`
+		Redirect string `json:"redirect" form:"redirect"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Dữ liệu không hợp lệ"})
+	}
 
 	var user models.User
-	if err := database.DB.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := database.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email hoặc mật khẩu không đúng"})
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{"success": false, "message": "Email hoặc mật khẩu không đúng"})
 	}
 
@@ -65,7 +77,7 @@ func Login(c echo.Context) error {
 	sess.Values["user_name"] = user.Name
 	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": c.FormValue("redirect")})
+	return c.JSON(http.StatusOK, map[string]interface{}{"success": true, "redirect": req.Redirect})
 }
 
 func Logout(c echo.Context) error {
