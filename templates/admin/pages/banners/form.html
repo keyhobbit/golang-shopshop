@@ -11,7 +11,7 @@
     {{end}}
 
     <div class="bg-white rounded-xl shadow-sm p-6">
-        <form method="POST" action="{{if .IsEdit}}/admin/banners/{{.Banner.ID}}{{else}}/admin/banners{{end}}" enctype="multipart/form-data">
+        <form method="POST" action="{{if .IsEdit}}/banners/{{.Banner.ID}}{{else}}/banners{{end}}" enctype="multipart/form-data">
             <div class="space-y-4">
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề <span class="text-red-500">*</span></label>
@@ -52,7 +52,7 @@
                 <button type="submit" class="px-4 py-2 bg-admin-green text-admin-black font-semibold rounded-lg hover:bg-admin-green-dark hover:text-white transition-colors">
                     {{if .IsEdit}}Cập nhật{{else}}Tạo banner{{end}}
                 </button>
-                <a href="/admin/banners" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors">
+                <a href="/banners" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors">
                     Hủy
                 </a>
             </div>

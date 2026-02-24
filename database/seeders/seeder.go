@@ -15,6 +15,7 @@ func Seed(db *gorm.DB) {
 	seedAboutPage(db)
 	seedCategories(db)
 	seedProducts(db)
+	seedProductImages(db)
 	seedBanners(db)
 	log.Println("Seeding completed")
 }
@@ -112,6 +113,42 @@ func seedProducts(db *gorm.DB) {
 	db.Create(&products)
 }
 
+func seedProductImages(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Image{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	// Map slug → Unsplash CDN image URL for each product
+	productImages := map[string]string{
+		"tuong-phat-di-lac-ngoc-bich": "https://images.unsplash.com/photo-1604213410393-89f141bb96b8?w=600&q=80",
+		"tuong-ty-huu-vang":           "https://images.unsplash.com/photo-1589894404892-7310b3fb6cb8?w=600&q=80",
+		"vong-tay-thach-anh-hong":     "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80",
+		"vong-tay-mat-ho":             "https://images.unsplash.com/photo-1561828995-aa79a2db86dd?w=600&q=80",
+		"thach-anh-tim-tu-nhien":      "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=600&q=80",
+		"da-fluorite-cau-vong":        "https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=600&q=80",
+		"cay-kim-tien-phong-thuy":     "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80",
+		"cay-luoi-ho":                 "https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=600&q=80",
+		"tranh-ma-dao-thanh-cong":     "https://images.unsplash.com/photo-1534224039826-c7a0eda0e6b3?w=600&q=80",
+		"tranh-cuu-ngu-quan-hoi":      "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=600&q=80",
+	}
+
+	var products []models.Product
+	db.Find(&products)
+	for _, p := range products {
+		if imgURL, ok := productImages[p.Slug]; ok {
+			db.Create(&models.Image{
+				ProductID: p.ID,
+				URL:       imgURL,
+				AltText:   p.Name,
+				SortOrder: 0,
+				IsPrimary: true,
+			})
+		}
+	}
+}
+
 func seedBanners(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Banner{}).Count(&count)
@@ -119,9 +156,30 @@ func seedBanners(db *gorm.DB) {
 		return
 	}
 	banners := []models.Banner{
-		{Title: "Phong Thủy Cho Mọi Nhà", Subtitle: "Khám phá bộ sưu tập phong thủy độc đáo", Image: "/static/images/banners/banner1.jpg", Link: "/products", SortOrder: 1, IsActive: true},
-		{Title: "Giảm Giá Đến 30%", Subtitle: "Ưu đãi đặc biệt cho sản phẩm phong thủy", Image: "/static/images/banners/banner2.jpg", Link: "/products", SortOrder: 2, IsActive: true},
-		{Title: "Vòng Tay Phong Thủy", Subtitle: "Bộ sưu tập vòng tay đá quý mới nhất", Image: "/static/images/banners/banner3.jpg", Link: "/products?category=vong-tay-phong-thuy", SortOrder: 3, IsActive: true},
+		{
+			Title:     "Phong Thủy Cho Mọi Nhà",
+			Subtitle:  "Khám phá bộ sưu tập phong thủy độc đáo",
+			Image:     "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=1200&q=80",
+			Link:      "/products",
+			SortOrder: 1,
+			IsActive:  true,
+		},
+		{
+			Title:     "Giảm Giá Đến 30%",
+			Subtitle:  "Ưu đãi đặc biệt cho sản phẩm phong thủy",
+			Image:     "https://images.unsplash.com/photo-1503640538573-148065ba4904?w=1200&q=80",
+			Link:      "/products",
+			SortOrder: 2,
+			IsActive:  true,
+		},
+		{
+			Title:     "Vòng Tay Phong Thủy",
+			Subtitle:  "Bộ sưu tập vòng tay đá quý mới nhất",
+			Image:     "https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=1200&q=80",
+			Link:      "/products?category=vong-tay-phong-thuy",
+			SortOrder: 3,
+			IsActive:  true,
+		},
 	}
 	db.Create(&banners)
 }

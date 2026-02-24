@@ -41,7 +41,7 @@ func Login(c echo.Context) error {
 	sess.Values["admin_name"] = admin.Name
 	sess.Save(c.Request(), c.Response())
 
-	return c.Redirect(http.StatusFound, "/admin/dashboard")
+	return c.Redirect(http.StatusFound, "/dashboard")
 }
 
 func Logout(c echo.Context) error {
@@ -49,5 +49,5 @@ func Logout(c echo.Context) error {
 	sess.Values = make(map[interface{}]interface{})
 	sess.Options.MaxAge = -1
 	sess.Save(c.Request(), c.Response())
-	return c.Redirect(http.StatusFound, "/admin/login")
+	return c.Redirect(http.StatusFound, "/login")
 }

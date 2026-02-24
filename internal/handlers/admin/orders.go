@@ -36,7 +36,7 @@ func OrderDetail(c echo.Context) error {
 
 	var order models.Order
 	if err := database.DB.Preload("User").Preload("Items").Preload("Items.Product").First(&order, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/orders")
+		return c.Redirect(http.StatusFound, "/orders")
 	}
 	data["Order"] = order
 
@@ -49,12 +49,12 @@ func OrderUpdateStatus(c echo.Context) error {
 		"pending": true, "confirmed": true, "shipping": true, "delivered": true, "cancelled": true,
 	}
 	if !validStatuses[newStatus] {
-		return c.Redirect(http.StatusFound, "/admin/orders")
+		return c.Redirect(http.StatusFound, "/orders")
 	}
 
 	database.DB.Model(&models.Order{}).Where("id = ?", c.Param("id")).Update("status", newStatus)
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật trạng thái đơn hàng")
-	return c.Redirect(http.StatusFound, "/admin/orders/"+c.Param("id"))
+	return c.Redirect(http.StatusFound, "/orders/"+c.Param("id"))
 }

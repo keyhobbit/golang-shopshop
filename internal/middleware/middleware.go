@@ -15,7 +15,7 @@ func AdminAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		sess := session.GetAdminSession(c)
 		adminID, ok := sess.Values["admin_id"].(string)
 		if !ok || adminID == "" {
-			return c.Redirect(http.StatusFound, "/admin/login")
+			return c.Redirect(http.StatusFound, "/login")
 		}
 		c.Set("admin_id", adminID)
 		c.Set("admin_name", sess.Values["admin_name"])

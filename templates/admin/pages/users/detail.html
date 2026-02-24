@@ -2,7 +2,7 @@
 <div class="max-w-4xl">
     <div class="mb-6 flex justify-between items-center">
         <h3 class="text-xl font-semibold text-gray-800">Thông tin khách hàng</h3>
-        <a href="/admin/users" class="text-sm text-gray-600 hover:text-admin-green-dark">
+        <a href="/users" class="text-sm text-gray-600 hover:text-admin-green-dark">
             <i class="fas fa-arrow-left mr-1"></i>Quay lại
         </a>
     </div>
@@ -56,7 +56,7 @@
                         <td class="px-6 py-4">{{statusBadge .Status}}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{formatDateTime .CreatedAt}}</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="/admin/orders/{{.ID}}" class="text-admin-green-dark hover:underline text-sm">Xem</a>
+                            <a href="/orders/{{.ID}}" class="text-admin-green-dark hover:underline text-sm">Xem</a>
                         </td>
                     </tr>
                     {{else}}

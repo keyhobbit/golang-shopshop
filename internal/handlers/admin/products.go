@@ -76,7 +76,7 @@ func ProductStore(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã tạo sản phẩm thành công")
-	return c.Redirect(http.StatusFound, "/admin/products")
+	return c.Redirect(http.StatusFound, "/products")
 }
 
 func ProductEdit(c echo.Context) error {
@@ -86,7 +86,7 @@ func ProductEdit(c echo.Context) error {
 
 	var product models.Product
 	if err := database.DB.Preload("Images").First(&product, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/products")
+		return c.Redirect(http.StatusFound, "/products")
 	}
 	data["Product"] = product
 	data["IsEdit"] = true
@@ -101,7 +101,7 @@ func ProductEdit(c echo.Context) error {
 func ProductUpdate(c echo.Context) error {
 	var product models.Product
 	if err := database.DB.First(&product, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/products")
+		return c.Redirect(http.StatusFound, "/products")
 	}
 
 	originalPrice, _ := strconv.ParseFloat(c.FormValue("original_price"), 64)
@@ -125,7 +125,7 @@ func ProductUpdate(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật sản phẩm")
-	return c.Redirect(http.StatusFound, "/admin/products")
+	return c.Redirect(http.StatusFound, "/products")
 }
 
 func ProductDelete(c echo.Context) error {
@@ -133,7 +133,7 @@ func ProductDelete(c echo.Context) error {
 	database.DB.Where("id = ?", c.Param("id")).Delete(&models.Product{})
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã xóa sản phẩm")
-	return c.Redirect(http.StatusFound, "/admin/products")
+	return c.Redirect(http.StatusFound, "/products")
 }
 
 func ImageDelete(c echo.Context) error {

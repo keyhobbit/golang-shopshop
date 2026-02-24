@@ -31,15 +31,15 @@ func main() {
 	e.Static("/static", "static")
 	e.Static("/uploads", "uploads")
 
-	e.GET("/admin/login", adminHandlers.LoginPage)
-	e.POST("/admin/login", adminHandlers.Login)
-	e.GET("/admin/logout", adminHandlers.Logout)
+	e.GET("/login", adminHandlers.LoginPage)
+	e.POST("/login", adminHandlers.Login)
+	e.GET("/logout", adminHandlers.Logout)
 
-	admin := e.Group("/admin", middleware.AdminAuth)
+	admin := e.Group("", middleware.AdminAuth)
 
 	admin.GET("/dashboard", adminHandlers.Dashboard)
-	admin.GET("", func(c echo.Context) error {
-		return c.Redirect(301, "/admin/dashboard")
+	admin.GET("/", func(c echo.Context) error {
+		return c.Redirect(301, "/dashboard")
 	})
 
 	admin.GET("/categories", adminHandlers.CategoryList)

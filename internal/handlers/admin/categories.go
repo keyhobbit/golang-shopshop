@@ -52,7 +52,7 @@ func CategoryStore(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã tạo danh mục thành công")
-	return c.Redirect(http.StatusFound, "/admin/categories")
+	return c.Redirect(http.StatusFound, "/categories")
 }
 
 func CategoryEdit(c echo.Context) error {
@@ -62,7 +62,7 @@ func CategoryEdit(c echo.Context) error {
 
 	var cat models.Category
 	if err := database.DB.First(&cat, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/categories")
+		return c.Redirect(http.StatusFound, "/categories")
 	}
 	data["Category"] = cat
 	data["IsEdit"] = true
@@ -73,7 +73,7 @@ func CategoryEdit(c echo.Context) error {
 func CategoryUpdate(c echo.Context) error {
 	var cat models.Category
 	if err := database.DB.First(&cat, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/categories")
+		return c.Redirect(http.StatusFound, "/categories")
 	}
 
 	sortOrder, _ := strconv.Atoi(c.FormValue("sort_order"))
@@ -87,12 +87,12 @@ func CategoryUpdate(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật danh mục")
-	return c.Redirect(http.StatusFound, "/admin/categories")
+	return c.Redirect(http.StatusFound, "/categories")
 }
 
 func CategoryDelete(c echo.Context) error {
 	database.DB.Where("id = ?", c.Param("id")).Delete(&models.Category{})
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã xóa danh mục")
-	return c.Redirect(http.StatusFound, "/admin/categories")
+	return c.Redirect(http.StatusFound, "/categories")
 }

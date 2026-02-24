@@ -1,7 +1,7 @@
 {{define "content"}}
 <div class="flex justify-between items-center mb-6">
     <h3 class="text-xl font-semibold text-gray-800">Danh sách danh mục</h3>
-    <a href="/admin/categories/create" class="inline-flex items-center px-4 py-2 bg-admin-green text-admin-black font-semibold rounded-lg hover:bg-admin-green-dark hover:text-white transition-colors">
+    <a href="/categories/create" class="inline-flex items-center px-4 py-2 bg-admin-green text-admin-black font-semibold rounded-lg hover:bg-admin-green-dark hover:text-white transition-colors">
         <i class="fas fa-plus mr-2"></i>Thêm danh mục
     </a>
 </div>
@@ -32,10 +32,10 @@
                         {{end}}
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <a href="/admin/categories/{{.ID}}/edit" class="inline-flex items-center px-3 py-1.5 text-sm text-admin-green-dark hover:bg-admin-green-light rounded-lg transition-colors mr-2">
+                        <a href="/categories/{{.ID}}/edit" class="inline-flex items-center px-3 py-1.5 text-sm text-admin-green-dark hover:bg-admin-green-light rounded-lg transition-colors mr-2">
                             <i class="fas fa-edit mr-1"></i>Sửa
                         </a>
-                        <a href="/admin/categories/{{.ID}}/delete" class="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">
+                        <a href="/categories/{{.ID}}/delete" class="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">
                             <i class="fas fa-trash mr-1"></i>Xóa
                         </a>
                     </td>
@@ -44,7 +44,7 @@
                 <tr>
                     <td colspan="5" class="px-6 py-12 text-center text-gray-400">
                         <i class="fas fa-tags text-4xl mb-3 block opacity-50"></i>
-                        Chưa có danh mục nào. <a href="/admin/categories/create" class="text-admin-green-dark hover:underline">Thêm danh mục</a>
+                        Chưa có danh mục nào. <a href="/categories/create" class="text-admin-green-dark hover:underline">Thêm danh mục</a>
                     </td>
                 </tr>
                 {{end}}

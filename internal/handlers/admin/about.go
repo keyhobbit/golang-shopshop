@@ -33,5 +33,5 @@ func AboutUpdate(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật trang giới thiệu")
-	return c.Redirect(http.StatusFound, "/admin/about")
+	return c.Redirect(http.StatusFound, "/about")
 }

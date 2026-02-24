@@ -77,6 +77,19 @@ func (p Product) SalePercent() int {
 	return int(((p.OriginalPrice - p.SalePrice) / p.OriginalPrice) * 100)
 }
 
+// ImageURL returns the URL of the primary (or first) product image.
+func (p Product) ImageURL() string {
+	for _, img := range p.Images {
+		if img.IsPrimary {
+			return img.URL
+		}
+	}
+	if len(p.Images) > 0 {
+		return p.Images[0].URL
+	}
+	return ""
+}
+
 type Image struct {
 	BaseModel
 	ProductID string `gorm:"index" json:"product_id"`

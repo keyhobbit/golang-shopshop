@@ -28,7 +28,7 @@ func UserDetail(c echo.Context) error {
 
 	var user models.User
 	if err := database.DB.Preload("Orders").First(&user, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/users")
+		return c.Redirect(http.StatusFound, "/users")
 	}
 	data["User"] = user
 

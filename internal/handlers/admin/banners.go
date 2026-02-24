@@ -57,7 +57,7 @@ func BannerStore(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã tạo banner thành công")
-	return c.Redirect(http.StatusFound, "/admin/banners")
+	return c.Redirect(http.StatusFound, "/banners")
 }
 
 func BannerEdit(c echo.Context) error {
@@ -67,7 +67,7 @@ func BannerEdit(c echo.Context) error {
 
 	var banner models.Banner
 	if err := database.DB.First(&banner, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/banners")
+		return c.Redirect(http.StatusFound, "/banners")
 	}
 	data["Banner"] = banner
 	data["IsEdit"] = true
@@ -78,7 +78,7 @@ func BannerEdit(c echo.Context) error {
 func BannerUpdate(c echo.Context) error {
 	var banner models.Banner
 	if err := database.DB.First(&banner, "id = ?", c.Param("id")).Error; err != nil {
-		return c.Redirect(http.StatusFound, "/admin/banners")
+		return c.Redirect(http.StatusFound, "/banners")
 	}
 
 	sortOrder, _ := strconv.Atoi(c.FormValue("sort_order"))
@@ -96,14 +96,14 @@ func BannerUpdate(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật banner")
-	return c.Redirect(http.StatusFound, "/admin/banners")
+	return c.Redirect(http.StatusFound, "/banners")
 }
 
 func BannerDelete(c echo.Context) error {
 	database.DB.Where("id = ?", c.Param("id")).Delete(&models.Banner{})
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã xóa banner")
-	return c.Redirect(http.StatusFound, "/admin/banners")
+	return c.Redirect(http.StatusFound, "/banners")
 }
 
 func handleBannerUpload(c echo.Context) string {

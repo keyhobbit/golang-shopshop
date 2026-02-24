@@ -39,5 +39,5 @@ func CompanyUpdate(c echo.Context) error {
 
 	sess := session.GetAdminSession(c)
 	session.SetFlash(c, sess, session.FlashSuccess, "Đã cập nhật thông tin công ty")
-	return c.Redirect(http.StatusFound, "/admin/company")
+	return c.Redirect(http.StatusFound, "/company")
 }

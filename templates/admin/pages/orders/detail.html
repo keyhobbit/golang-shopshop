@@ -2,7 +2,7 @@
 <div class="max-w-4xl">
     <div class="mb-6 flex justify-between items-center">
         <h3 class="text-xl font-semibold text-gray-800">Chi tiết đơn hàng #{{truncate .Order.ID 8}}</h3>
-        <a href="/admin/orders" class="text-sm text-gray-600 hover:text-admin-green-dark">
+        <a href="/orders" class="text-sm text-gray-600 hover:text-admin-green-dark">
             <i class="fas fa-arrow-left mr-1"></i>Quay lại
         </a>
     </div>
@@ -35,7 +35,7 @@
         </div>
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h4 class="text-sm font-semibold text-gray-500 uppercase mb-4">Trạng thái đơn hàng</h4>
-            <form method="POST" action="/admin/orders/{{.Order.ID}}/status">
+            <form method="POST" action="/orders/{{.Order.ID}}/status">
                 <div class="mb-4">
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Cập nhật trạng thái</label>
                     <select id="status" name="status"
