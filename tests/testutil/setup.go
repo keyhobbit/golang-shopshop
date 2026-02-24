@@ -76,14 +76,14 @@ func NewAdminEcho() *echo.Echo {
 	e := echo.New()
 	e.Renderer = &NoopRenderer{}
 
-	e.GET("/admin/login", adminHandlers.LoginPage)
-	e.POST("/admin/login", adminHandlers.Login)
-	e.GET("/admin/logout", adminHandlers.Logout)
+	e.GET("/login", adminHandlers.LoginPage)
+	e.POST("/login", adminHandlers.Login)
+	e.GET("/logout", adminHandlers.Logout)
 
-	admin := e.Group("/admin", middleware.AdminAuth)
+	admin := e.Group("", middleware.AdminAuth)
 	admin.GET("/dashboard", adminHandlers.Dashboard)
 	admin.GET("", func(c echo.Context) error {
-		return c.Redirect(301, "/admin/dashboard")
+		return c.Redirect(301, "/dashboard")
 	})
 
 	admin.GET("/categories", adminHandlers.CategoryList)
@@ -170,11 +170,11 @@ func NewAdminRenderedEcho() *echo.Echo {
 	e := echo.New()
 	e.Renderer = utils.NewAdminRenderer("../../templates")
 
-	e.GET("/admin/login", adminHandlers.LoginPage)
-	e.POST("/admin/login", adminHandlers.Login)
-	e.GET("/admin/logout", adminHandlers.Logout)
+	e.GET("/login", adminHandlers.LoginPage)
+	e.POST("/login", adminHandlers.Login)
+	e.GET("/logout", adminHandlers.Logout)
 
-	admin := e.Group("/admin", middleware.AdminAuth)
+	admin := e.Group("", middleware.AdminAuth)
 	admin.GET("/dashboard", adminHandlers.Dashboard)
 
 	admin.GET("/categories", adminHandlers.CategoryList)
@@ -305,7 +305,7 @@ func AdminLoginCookies(t *testing.T, ts *httptest.Server) []*http.Cookie {
 		return http.ErrUseLastResponse
 	}}
 
-	resp, err := client.PostForm(ts.URL+"/admin/login", url.Values{
+	resp, err := client.PostForm(ts.URL+"/login", url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"admin123"},
 	})

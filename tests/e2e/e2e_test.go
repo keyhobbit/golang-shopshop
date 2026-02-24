@@ -232,7 +232,7 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	client := clientWithJar(jar)
 
 	// 1. Login as admin
-	resp, err := client.PostForm(ts.URL+"/admin/login", url.Values{
+	resp, err := client.PostForm(ts.URL+"/login", url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"admin123"},
 	})
@@ -243,12 +243,12 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("step 1: expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/dashboard" {
-		t.Errorf("step 1: expected Location /admin/dashboard, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/dashboard" {
+		t.Errorf("step 1: expected Location /dashboard, got %s", loc)
 	}
 
 	// 2. View dashboard
-	resp, err = client.Get(ts.URL + "/admin/dashboard")
+	resp, err = client.Get(ts.URL + "/dashboard")
 	if err != nil {
 		t.Fatalf("dashboard: %v", err)
 	}
@@ -258,11 +258,11 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	}
 
 	// 3. Create category
-	resp, err = client.PostForm(ts.URL+"/admin/categories", url.Values{
+	resp, err = client.PostForm(ts.URL+"/categories", url.Values{
 		"name":        {"E2E Category"},
 		"description": {"E2E desc"},
-		"sort_order": {"0"},
-		"is_active":  {"on"},
+		"sort_order":  {"0"},
+		"is_active":   {"on"},
 	})
 	if err != nil {
 		t.Fatalf("create category: %v", err)
@@ -279,7 +279,7 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	}
 
 	// 5. Create product
-	resp, err = client.PostForm(ts.URL+"/admin/products", url.Values{
+	resp, err = client.PostForm(ts.URL+"/products", url.Values{
 		"name":           {"E2E Product"},
 		"description":    {"E2E product desc"},
 		"content":        {""},
@@ -309,7 +309,7 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	}
 
 	// 7. Update product price
-	resp, err = client.PostForm(ts.URL+"/admin/products/"+prod.ID, url.Values{
+	resp, err = client.PostForm(ts.URL+"/products/"+prod.ID, url.Values{
 		"name":           {"E2E Product"},
 		"description":    {"E2E product desc"},
 		"content":        {""},
@@ -336,7 +336,7 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	}
 
 	// 9. Delete product (soft delete)
-	resp, err = client.PostForm(ts.URL+"/admin/products/"+prod.ID+"/delete", url.Values{})
+	resp, err = client.PostForm(ts.URL+"/products/"+prod.ID+"/delete", url.Values{})
 	if err != nil {
 		t.Fatalf("delete product: %v", err)
 	}
@@ -357,7 +357,7 @@ func TestE2E_AdminCategoryProductManagement(t *testing.T) {
 	}
 
 	// 11. Delete category (soft delete)
-	resp, err = client.PostForm(ts.URL+"/admin/categories/"+cat.ID+"/delete", url.Values{})
+	resp, err = client.PostForm(ts.URL+"/categories/"+cat.ID+"/delete", url.Values{})
 	if err != nil {
 		t.Fatalf("delete category: %v", err)
 	}
@@ -389,7 +389,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	cookies := testutil.AdminLoginCookies(t, ts)
 
 	// 3. View orders list
-	resp, err := testutil.GetWithCookies(ts, "/admin/orders", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/orders", cookies)
 	if err != nil {
 		t.Fatalf("orders list: %v", err)
 	}
@@ -399,7 +399,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	}
 
 	// 4. View order detail
-	resp, err = testutil.GetWithCookies(ts, "/admin/orders/"+order.ID, cookies)
+	resp, err = testutil.GetWithCookies(ts, "/orders/"+order.ID, cookies)
 	if err != nil {
 		t.Fatalf("order detail: %v", err)
 	}
@@ -409,7 +409,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	}
 
 	// 5. Update status to confirmed
-	resp, err = testutil.PostForm(ts, "/admin/orders/"+order.ID+"/status", cookies, url.Values{"status": {"confirmed"}})
+	resp, err = testutil.PostForm(ts, "/orders/"+order.ID+"/status", cookies, url.Values{"status": {"confirmed"}})
 	if err != nil {
 		t.Fatalf("update status: %v", err)
 	}
@@ -424,7 +424,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	}
 
 	// 6-7. Update to shipping
-	resp, err = testutil.PostForm(ts, "/admin/orders/"+order.ID+"/status", cookies, url.Values{"status": {"shipping"}})
+	resp, err = testutil.PostForm(ts, "/orders/"+order.ID+"/status", cookies, url.Values{"status": {"shipping"}})
 	if err != nil {
 		t.Fatalf("update status shipping: %v", err)
 	}
@@ -435,7 +435,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	}
 
 	// 8. Update to delivered
-	resp, err = testutil.PostForm(ts, "/admin/orders/"+order.ID+"/status", cookies, url.Values{"status": {"delivered"}})
+	resp, err = testutil.PostForm(ts, "/orders/"+order.ID+"/status", cookies, url.Values{"status": {"delivered"}})
 	if err != nil {
 		t.Fatalf("update status delivered: %v", err)
 	}
@@ -446,7 +446,7 @@ func TestE2E_AdminOrderManagement(t *testing.T) {
 	}
 
 	// 9. Try invalid status → verify DB unchanged
-	resp, err = testutil.PostForm(ts, "/admin/orders/"+order.ID+"/status", cookies, url.Values{"status": {"invalid_status"}})
+	resp, err = testutil.PostForm(ts, "/orders/"+order.ID+"/status", cookies, url.Values{"status": {"invalid_status"}})
 	if err != nil {
 		t.Fatalf("update invalid status: %v", err)
 	}
@@ -472,7 +472,7 @@ func TestE2E_AdminBannerManagement(t *testing.T) {
 	cookies := testutil.AdminLoginCookies(t, ts)
 
 	// 2. Create banner (POST without image - handler allows empty image)
-	resp, err := testutil.PostForm(ts, "/admin/banners", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/banners", cookies, url.Values{
 		"title":      {"E2E Banner"},
 		"subtitle":   {"E2E Subtitle"},
 		"link":       {"/products"},
@@ -493,7 +493,7 @@ func TestE2E_AdminBannerManagement(t *testing.T) {
 	}
 
 	// 4. Update banner title
-	resp, err = testutil.PostForm(ts, "/admin/banners/"+banner.ID, cookies, url.Values{
+	resp, err = testutil.PostForm(ts, "/banners/"+banner.ID, cookies, url.Values{
 		"title":      {"Updated E2E Banner"},
 		"subtitle":   {"E2E Subtitle"},
 		"link":       {"/products"},
@@ -515,7 +515,7 @@ func TestE2E_AdminBannerManagement(t *testing.T) {
 	}
 
 	// 6. Delete banner
-	resp, err = testutil.PostForm(ts, "/admin/banners/"+banner.ID+"/delete", cookies, url.Values{})
+	resp, err = testutil.PostForm(ts, "/banners/"+banner.ID+"/delete", cookies, url.Values{})
 	if err != nil {
 		t.Fatalf("delete banner: %v", err)
 	}
@@ -547,7 +547,7 @@ func TestE2E_AdminCompanyAndAboutManagement(t *testing.T) {
 	cookies := testutil.AdminLoginCookies(t, tsAdmin)
 
 	// 2. Update company info
-	resp, err := testutil.PostForm(tsAdmin, "/admin/company", cookies, url.Values{
+	resp, err := testutil.PostForm(tsAdmin, "/company", cookies, url.Values{
 		"name":         {"E2E Company Inc"},
 		"tagline":      {"E2E Tagline"},
 		"email":        {"e2e@company.com"},
@@ -576,7 +576,7 @@ func TestE2E_AdminCompanyAndAboutManagement(t *testing.T) {
 	}
 
 	// 4. Update about page
-	resp, err = testutil.PostForm(tsAdmin, "/admin/about", cookies, url.Values{
+	resp, err = testutil.PostForm(tsAdmin, "/about", cookies, url.Values{
 		"title":   {"E2E About Title"},
 		"content": {"<p>E2E about content</p>"},
 	})
@@ -772,7 +772,7 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	client.Jar = jar
 
 	// 1. Try accessing admin dashboard without login → 302 to login
-	resp, err := client.Get(tsAdmin.URL + "/admin/dashboard")
+	resp, err := client.Get(tsAdmin.URL + "/dashboard")
 	if err != nil {
 		t.Fatalf("dashboard unauthenticated: %v", err)
 	}
@@ -780,12 +780,12 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("step 1: expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/login" {
-		t.Errorf("step 1: expected Location /admin/login, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 1: expected Location /login, got %s", loc)
 	}
 
 	// 2. Login with wrong password → 200 (stays on login page)
-	resp, err = client.PostForm(tsAdmin.URL+"/admin/login", url.Values{
+	resp, err = client.PostForm(tsAdmin.URL+"/login", url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"wrongpassword"},
 	})
@@ -800,7 +800,7 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	testutil.CreateTestAdmin(t)
 
 	// 3. Login successfully → 302 to dashboard
-	resp, err = client.PostForm(tsAdmin.URL+"/admin/login", url.Values{
+	resp, err = client.PostForm(tsAdmin.URL+"/login", url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"admin123"},
 	})
@@ -811,12 +811,12 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("step 3: expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/dashboard" {
-		t.Errorf("step 3: expected Location /admin/dashboard, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/dashboard" {
+		t.Errorf("step 3: expected Location /dashboard, got %s", loc)
 	}
 
 	// 4. Logout → 302 to login
-	resp, err = client.Get(tsAdmin.URL + "/admin/logout")
+	resp, err = client.Get(tsAdmin.URL + "/logout")
 	if err != nil {
 		t.Fatalf("logout: %v", err)
 	}
@@ -824,12 +824,12 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("step 4: expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/login" {
-		t.Errorf("step 4: expected Location /admin/login, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 4: expected Location /login, got %s", loc)
 	}
 
 	// 5. Try accessing dashboard after logout → 302 to login
-	resp, err = client.Get(tsAdmin.URL + "/admin/dashboard")
+	resp, err = client.Get(tsAdmin.URL + "/dashboard")
 	if err != nil {
 		t.Fatalf("dashboard after logout: %v", err)
 	}
@@ -837,8 +837,8 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("step 5: expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/login" {
-		t.Errorf("step 5: expected Location /admin/login, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 5: expected Location /login, got %s", loc)
 	}
 
 	// 6. Web: register with duplicate email → 400
@@ -888,5 +888,124 @@ func TestE2E_AuthenticationEdgeCases(t *testing.T) {
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusUnauthorized {
 		t.Errorf("step 7: expected 401 (cart cleared/session gone), got %d", resp.StatusCode)
+	}
+}
+
+// TestE2E_AdminLoginSessionFlow is a regression test for the cookie path bug:
+// AdminStore.Options.Path was "/admin" so the session cookie was never sent
+// for routes without that prefix (e.g. /login, /dashboard, /products).
+// After login the middleware would not find the session and redirect back to /login.
+func TestE2E_AdminLoginSessionFlow(t *testing.T) {
+	testutil.SetupTestDB(t)
+	testutil.SetupSession()
+	testutil.CreateTestAdmin(t)
+	cat := testutil.CreateTestCategory(t)
+	testutil.CreateTestProduct(t, cat.ID)
+
+	e := testutil.NewAdminEcho()
+	ts := httptest.NewServer(e)
+	defer ts.Close()
+
+	jar, _ := cookiejar.New(nil)
+	client := clientWithJar(jar)
+
+	// 1. Unauthenticated access to /dashboard must redirect to /login
+	resp, err := client.Get(ts.URL + "/dashboard")
+	if err != nil {
+		t.Fatalf("step 1: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("step 1: expected 302 for unauthenticated /dashboard, got %d", resp.StatusCode)
+	}
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 1: expected redirect to /login, got %s", loc)
+	}
+
+	// 2. Wrong password stays on login (200)
+	resp, err = client.PostForm(ts.URL+"/login", url.Values{
+		"email":    {"admin@test.com"},
+		"password": {"wrongpassword"},
+	})
+	if err != nil {
+		t.Fatalf("step 2: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 2: expected 200 on wrong password, got %d", resp.StatusCode)
+	}
+
+	// 3. Correct credentials → 302 to /dashboard
+	resp, err = client.PostForm(ts.URL+"/login", url.Values{
+		"email":    {"admin@test.com"},
+		"password": {"admin123"},
+	})
+	if err != nil {
+		t.Fatalf("step 3: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("step 3: expected 302 after successful login, got %d", resp.StatusCode)
+	}
+	if loc := resp.Header.Get("Location"); loc != "/dashboard" {
+		t.Errorf("step 3: expected Location /dashboard, got %s", loc)
+	}
+
+	// 4. Session cookie must now be present and valid for /dashboard (200)
+	//    This step specifically catches the cookie-path regression: if Path="/admin"
+	//    the jar won't send the cookie and we'd get 302 instead of 200.
+	resp, err = client.Get(ts.URL + "/dashboard")
+	if err != nil {
+		t.Fatalf("step 4: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 4: expected 200 on authenticated /dashboard, got %d (session cookie path bug?)", resp.StatusCode)
+	}
+
+	// 5. Authenticated access to /products (200)
+	resp, err = client.Get(ts.URL + "/products")
+	if err != nil {
+		t.Fatalf("step 5: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 5: expected 200 on authenticated /products, got %d", resp.StatusCode)
+	}
+
+	// 6. Authenticated access to /categories (200)
+	resp, err = client.Get(ts.URL + "/categories")
+	if err != nil {
+		t.Fatalf("step 6: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("step 6: expected 200 on authenticated /categories, got %d", resp.StatusCode)
+	}
+
+	// 7. Logout → 302 to /login
+	resp, err = client.Get(ts.URL + "/logout")
+	if err != nil {
+		t.Fatalf("step 7: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("step 7: expected 302 on logout, got %d", resp.StatusCode)
+	}
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 7: expected Location /login after logout, got %s", loc)
+	}
+
+	// 8. After logout, session is gone — /dashboard must redirect again
+	resp, err = client.Get(ts.URL + "/dashboard")
+	if err != nil {
+		t.Fatalf("step 8: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("step 8: expected 302 after logout, got %d", resp.StatusCode)
+	}
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("step 8: expected redirect to /login after logout, got %s", loc)
 	}
 }

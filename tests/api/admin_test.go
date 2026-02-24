@@ -20,7 +20,7 @@ func TestAdminLogin_Success(t *testing.T) {
 	ts := httptest.NewServer(e)
 	defer ts.Close()
 
-	resp, err := testutil.PostForm(ts, "/admin/login", nil, url.Values{
+	resp, err := testutil.PostForm(ts, "/login", nil, url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"admin123"},
 	})
@@ -32,8 +32,8 @@ func TestAdminLogin_Success(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/dashboard" {
-		t.Errorf("expected Location /admin/dashboard, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/dashboard" {
+		t.Errorf("expected Location /dashboard, got %s", loc)
 	}
 }
 
@@ -46,7 +46,7 @@ func TestAdminLogin_InvalidPassword(t *testing.T) {
 	ts := httptest.NewServer(e)
 	defer ts.Close()
 
-	resp, err := testutil.PostForm(ts, "/admin/login", nil, url.Values{
+	resp, err := testutil.PostForm(ts, "/login", nil, url.Values{
 		"email":    {"admin@test.com"},
 		"password": {"wrongpassword"},
 	})
@@ -68,7 +68,7 @@ func TestAdminLogin_NonexistentUser(t *testing.T) {
 	ts := httptest.NewServer(e)
 	defer ts.Close()
 
-	resp, err := testutil.PostForm(ts, "/admin/login", nil, url.Values{
+	resp, err := testutil.PostForm(ts, "/login", nil, url.Values{
 		"email":    {"nonexistent@test.com"},
 		"password": {"any"},
 	})
@@ -92,7 +92,7 @@ func TestAdminLogout(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/logout", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/logout", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -101,8 +101,8 @@ func TestAdminLogout(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/login" {
-		t.Errorf("expected Location /admin/login, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("expected Location /login, got %s", loc)
 	}
 }
 
@@ -114,7 +114,7 @@ func TestAdminDashboard_Unauthenticated(t *testing.T) {
 	ts := httptest.NewServer(e)
 	defer ts.Close()
 
-	resp, err := testutil.GetWithCookies(ts, "/admin/dashboard", nil)
+	resp, err := testutil.GetWithCookies(ts, "/dashboard", nil)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -123,8 +123,8 @@ func TestAdminDashboard_Unauthenticated(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/login" {
-		t.Errorf("expected Location /admin/login, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/login" {
+		t.Errorf("expected Location /login, got %s", loc)
 	}
 }
 
@@ -138,7 +138,7 @@ func TestAdminDashboard_Authenticated(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/dashboard", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/dashboard", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -159,7 +159,7 @@ func TestAdminCategories_List(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/categories", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/categories", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -180,7 +180,7 @@ func TestAdminCategories_Create(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/categories", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/categories", cookies, url.Values{
 		"name":        {"New Category"},
 		"description": {"A test category"},
 		"sort_order":  {"0"},
@@ -194,8 +194,8 @@ func TestAdminCategories_Create(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/categories" {
-		t.Errorf("expected Location /admin/categories, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/categories" {
+		t.Errorf("expected Location /categories, got %s", loc)
 	}
 
 	var count int64
@@ -216,7 +216,7 @@ func TestAdminCategories_Update(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/categories/"+cat.ID, cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/categories/"+cat.ID, cookies, url.Values{
 		"name":        {"Updated Category"},
 		"description": {"Updated desc"},
 		"sort_order":  {"1"},
@@ -249,7 +249,7 @@ func TestAdminCategories_Delete(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/categories/"+cat.ID+"/delete", cookies, url.Values{})
+	resp, err := testutil.PostForm(ts, "/categories/"+cat.ID+"/delete", cookies, url.Values{})
 	if err != nil {
 		t.Fatalf("post failed: %v", err)
 	}
@@ -276,7 +276,7 @@ func TestAdminProducts_List(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/products", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/products", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -298,7 +298,7 @@ func TestAdminProducts_Create(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/products", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/products", cookies, url.Values{
 		"name":           {"New Product"},
 		"description":    {"A test product"},
 		"content":        {""},
@@ -318,8 +318,8 @@ func TestAdminProducts_Create(t *testing.T) {
 	if resp.StatusCode != http.StatusFound {
 		t.Errorf("expected 302, got %d", resp.StatusCode)
 	}
-	if loc := resp.Header.Get("Location"); loc != "/admin/products" {
-		t.Errorf("expected Location /admin/products, got %s", loc)
+	if loc := resp.Header.Get("Location"); loc != "/products" {
+		t.Errorf("expected Location /products, got %s", loc)
 	}
 
 	var count int64
@@ -341,7 +341,7 @@ func TestAdminProducts_Update(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/products/"+prod.ID, cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/products/"+prod.ID, cookies, url.Values{
 		"name":           {"Updated Product"},
 		"description":    {"Updated desc"},
 		"content":        {""},
@@ -381,7 +381,7 @@ func TestAdminProducts_Delete(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/products/"+prod.ID+"/delete", cookies, url.Values{})
+	resp, err := testutil.PostForm(ts, "/products/"+prod.ID+"/delete", cookies, url.Values{})
 	if err != nil {
 		t.Fatalf("post failed: %v", err)
 	}
@@ -408,7 +408,7 @@ func TestAdminOrders_List(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/orders", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/orders", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -433,7 +433,7 @@ func TestAdminOrders_Detail(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/orders/"+order.ID, cookies)
+	resp, err := testutil.GetWithCookies(ts, "/orders/"+order.ID, cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -458,7 +458,7 @@ func TestAdminOrders_UpdateStatus(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/orders/"+order.ID+"/status", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/orders/"+order.ID+"/status", cookies, url.Values{
 		"status": {"confirmed"},
 	})
 	if err != nil {
@@ -487,7 +487,7 @@ func TestAdminUsers_List(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/users", cookies)
+	resp, err := testutil.GetWithCookies(ts, "/users", cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -509,7 +509,7 @@ func TestAdminUsers_Detail(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.GetWithCookies(ts, "/admin/users/"+user.ID, cookies)
+	resp, err := testutil.GetWithCookies(ts, "/users/"+user.ID, cookies)
 	if err != nil {
 		t.Fatalf("get failed: %v", err)
 	}
@@ -532,7 +532,7 @@ func TestAdminBanners_CRUD(t *testing.T) {
 	cookies := testutil.AdminLoginCookies(t, ts)
 
 	// Create
-	resp, err := testutil.PostForm(ts, "/admin/banners", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/banners", cookies, url.Values{
 		"title":      {"New Banner"},
 		"subtitle":   {"Subtitle"},
 		"link":       {"/products"},
@@ -555,7 +555,7 @@ func TestAdminBanners_CRUD(t *testing.T) {
 	}
 
 	// List
-	resp, err = testutil.GetWithCookies(ts, "/admin/banners", cookies)
+	resp, err = testutil.GetWithCookies(ts, "/banners", cookies)
 	if err != nil {
 		t.Fatalf("get list failed: %v", err)
 	}
@@ -565,7 +565,7 @@ func TestAdminBanners_CRUD(t *testing.T) {
 	}
 
 	// Update
-	resp, err = testutil.PostForm(ts, "/admin/banners/"+banner.ID, cookies, url.Values{
+	resp, err = testutil.PostForm(ts, "/banners/"+banner.ID, cookies, url.Values{
 		"title":      {"Updated Banner"},
 		"subtitle":   {"Updated sub"},
 		"link":       {"/about"},
@@ -587,7 +587,7 @@ func TestAdminBanners_CRUD(t *testing.T) {
 	}
 
 	// Delete
-	resp, err = testutil.PostForm(ts, "/admin/banners/"+banner.ID+"/delete", cookies, url.Values{})
+	resp, err = testutil.PostForm(ts, "/banners/"+banner.ID+"/delete", cookies, url.Values{})
 	if err != nil {
 		t.Fatalf("post delete failed: %v", err)
 	}
@@ -613,7 +613,7 @@ func TestAdminCompany_Update(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/company", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/company", cookies, url.Values{
 		"name":         {"Test Company Inc"},
 		"tagline":      {"New tagline"},
 		"email":        {"company@test.com"},
@@ -652,7 +652,7 @@ func TestAdminAbout_Update(t *testing.T) {
 	defer ts.Close()
 
 	cookies := testutil.AdminLoginCookies(t, ts)
-	resp, err := testutil.PostForm(ts, "/admin/about", cookies, url.Values{
+	resp, err := testutil.PostForm(ts, "/about", cookies, url.Values{
 		"title":   {"Updated About Title"},
 		"content": {"<p>Updated about content</p>"},
 	})

@@ -20,7 +20,7 @@ var (
 func Init(secret string) {
 	AdminStore = sessions.NewCookieStore([]byte("admin-" + secret))
 	AdminStore.Options = &sessions.Options{
-		Path:     "/admin",
+		Path:     "/",
 		MaxAge:   86400 * 7,
 		HttpOnly: true,
 	}
